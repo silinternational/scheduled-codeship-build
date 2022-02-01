@@ -1,0 +1,19 @@
+{
+  "name": "scheduled-codeship-builder",
+  "description": "A Serverless API for triggering a build on a Codeship project",
+  "dependencies": {
+    "aws-sdk": "^2.187.0"
+  },
+  "engines": {
+    "node": ">=6.5.0 <7.0.0"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/silinternational/scheduled-codeship-builder"
+  },
+  "scripts": {},
+  "devDependencies": {
+    "serverless-domain-manager": "^2.4.0"
+  }
+}
