@@ -1,4 +1,4 @@
-module github.org/silinternational/scheduled-codeship-build
+module github.com/silinternational/scheduled-codeship-build
 
 go 1.17
 
