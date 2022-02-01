@@ -8,8 +8,6 @@ services:
       dockerfile: Dockerfile
     env_file:
       - local.env # add the non-AWS entries from aws.env.example
-    environment:
-      GOOS: linux
     volumes:
       - ./:/app
     working_dir: /app
@@ -19,8 +17,6 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
-    environment:
-      GOOS: linux
     volumes:
       - ./:/app
     working_dir: /app
