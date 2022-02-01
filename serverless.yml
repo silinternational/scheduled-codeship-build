@@ -1,0 +1,31 @@
+service: scheduled-codeship-build
+
+provider:
+  name: aws
+  runtime: go1.x
+  stage: prod
+  timeout: 30
+  versionFunctions: false
+  memorySize: 512
+  logRetentionInDays: 14
+
+package:
+  exclude:
+    - ./**
+  include:
+    - ./bin/**
+
+functions:
+  builder:
+    environment:
+      CS_ORGANIZATION: ${env:CS_ORGANIZATION}
+      CS_PASSWORD: ${env:CS_PASSWORD}
+      CS_USERNAME: ${env:CS_USERNAME}
+      CS_BUILD_REFERENCE: ${env:CS_BUILD_REFERENCE}
+      CS_PROJECT_UUID: ${env:CS_PROJECT_UUID}
+    handler: bin/builder
+    timeout: 300
+    events:
+      # - schedule: cron(0 1 1 * ? *)
+       - schedule: cron(0/10 * * * ? *)
+
