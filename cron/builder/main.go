@@ -124,6 +124,10 @@ func triggerBuild(ctx context.Context, config BuilderConfig, org *codeship.Organ
 }
 
 func handler(config BuilderConfig) error {
+	if err := config.init(); err != nil {
+		return err
+	}
+
 	auth := codeship.NewBasicAuth(config.CSUsername, config.CSPassword)
 	client, err := codeship.New(auth)
 	if err != nil {

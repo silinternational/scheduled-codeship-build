@@ -15,7 +15,7 @@ It makes use of the *codeship-go* API client.
 ## Testing against Codeship
 
 Add the real environment variable entries to your local.env file.
-Then do `make debug`, comment out the `skip` line in app/cron/builder/main_test.go in the `TestHandler` function. 
+Then do `make debug`, comment out the `t.Skip` line in app/cron/builder/main_test.go in the `TestHandler` function. 
 Then, in that directory, run `go test ./...`
 
 Note: that will make one of the other tests fail because of the presence of all the environment variables.

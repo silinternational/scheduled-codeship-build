@@ -1,8 +1,8 @@
-FROM golang:1.17.3
+FROM golang:1.17
 
 # Install packages
-RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
-RUN apt-get install -y git nodejs netcat
+RUN curl -sL https://deb.nodesource.com/setup_16.x | bash -
+RUN apt-get install -y nodejs
 
 RUN alias ll="ls -al"
 
