@@ -80,28 +80,6 @@ type BuilderConfig struct {
 	CSProjectUUID    string `json:"CSProjectUUID"`
 }
 
-func getProject(ctx context.Context, config BuilderConfig, org *codeship.Organization) (codeship.Project, error) {
-	projList, _, err := org.ListProjects(ctx)
-	if err != nil {
-		return codeship.Project{}, errors.New("error getting project list: " + err.Error())
-	}
-
-	projCount := len(projList.Projects)
-	fmt.Printf("Project count: %d for org: %s\n", projCount, org.Name)
-
-	if projCount < 1 {
-		return codeship.Project{}, errors.New("no projects found for org " + config.CSOrganization)
-	}
-
-	for _, p := range projList.Projects {
-		if p.UUID == config.CSProjectUUID {
-			return p, nil
-		}
-	}
-
-	return codeship.Project{}, errors.New("failed to find Codeship project with uuid: " + config.CSProjectUUID)
-}
-
 func triggerBuild(ctx context.Context, config BuilderConfig, org *codeship.Organization) (codeship.Response, error) {
 	headsPrefix := "heads/"
 	buildRef := config.CSBuildReference
@@ -109,7 +87,6 @@ func triggerBuild(ctx context.Context, config BuilderConfig, org *codeship.Organ
 		buildRef = headsPrefix + buildRef
 	}
 	success, resp, err := org.CreateBuild(ctx, config.CSProjectUUID, buildRef, "")
-
 	if err != nil {
 		return codeship.Response{},
 			fmt.Errorf("error triggering build on project with uuid: %s. %s",
@@ -147,10 +124,9 @@ func handler(config BuilderConfig) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("Response from codeship build call: %d %s\n", resp.StatusCode, resp.Status)
+	log.Printf("Response from codeship build call: %d %s\n", resp.StatusCode, resp.Status)
 
 	return nil
-
 }
 
 func main() {
