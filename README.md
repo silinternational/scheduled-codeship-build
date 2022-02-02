@@ -20,6 +20,7 @@ on the targeted projects
 
 * CS2_PROJECT_UUID // the uuid of the second target Codeship project
 * CS2_BUILD_REFERENCE // the desired reference for the build, e.g. "20.04" or "develop"
+(note: "heads/" will be prepended to this value, if it is not already there)
 
 ## Environment variables for deploying via Codeship
 See the `aws.env.example` file for the full set of environment variables.
