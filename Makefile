@@ -8,7 +8,7 @@ build:
 	docker-compose run --rm app ./codeship/build.sh
 
 test:
-	docker-compose run --rm test ./codeship/test.sh
+	docker-compose run --rm app ./codeship/test.sh
 
 clean:
 	docker-compose kill
