@@ -1,5 +1,5 @@
 {
-  "name": "scheduled-codeship-builder",
+  "name": "scheduled-codeship-build",
   "description": "An AWS lambda for triggering a build on a Codeship project",
   "dependencies": {
     "aws-sdk": "^2.187.0"
