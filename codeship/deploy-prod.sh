@@ -15,4 +15,4 @@ export CS_USERNAME="${CS_USERNAME}"
 export CS_PROJECT_UUID="${CS_PROJECT_UUID}"
 export CS_BUILD_REFERENCE="${CS_BUILD_REFERENCE}"
 
-serverless deploy --version --verbose --stage prod
+serverless deploy --verbose --stage prod
