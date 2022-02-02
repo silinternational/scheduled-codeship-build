@@ -10,10 +10,9 @@ provider:
   logRetentionInDays: 14
 
 package:
-  exclude:
-    - ./**
-  include:
-    - ./bin/**
+  patterns:
+    - '!./**'
+    - './bin/**'
 
 functions:
   builder:
