@@ -1,11 +1,11 @@
 {
   "name": "scheduled-codeship-builder",
-  "description": "A Serverless API for triggering a build on a Codeship project",
+  "description": "An AWS lambda for triggering a build on a Codeship project",
   "dependencies": {
     "aws-sdk": "^2.187.0"
   },
   "engines": {
-    "node": ">=6.5.0 <7.0.0"
+    "node": ">=16.13.2 <17.0.0"
   },
   "license": "MIT",
   "repository": {
