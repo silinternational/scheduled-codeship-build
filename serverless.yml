@@ -36,6 +36,6 @@ functions:
     handler: bin/builder
     timeout: 300
     events:
-      - schedule: cron(0 1 9 * ? *)
+      - schedule: cron(0 3 8 * ? *)
       # - schedule: cron(0/10 * * * ? *)
 
