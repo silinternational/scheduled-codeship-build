@@ -58,6 +58,6 @@ You can just ignore that.
 10. Commit the new `aws.env.encrypted` file on the `develop` branch and push it to Github
 11. Submit a PR to release the change to the `main` branch
 
-### Cloudflare
+### Codeship
 
 (TBD)
