@@ -19,6 +19,4 @@ export CS1_BUILD_REFERENCE="${CS1_BUILD_REFERENCE}"
 export CS2_PROJECT_UUID="${CS2_PROJECT_UUID}"
 export CS2_BUILD_REFERENCE="${CS2_BUILD_REFERENCE}"
 
-pwd
-
 $HOME/.serverless/bin/serverless deploy --verbose --stage prod
