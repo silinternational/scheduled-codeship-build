@@ -6,7 +6,7 @@ module "serverless-user" {
   source  = "silinternational/serverless-user/aws"
   version = "0.1.0"
 
-  app_name   = "cloudflare-scanner"
+  app_name   = "scheduled-codeship-build"
   aws_region = var.aws_region
 }
 
