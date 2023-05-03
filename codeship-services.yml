@@ -1,5 +1,15 @@
 app:
   build:
     dockerfile_path: Dockerfile
-  encrypted_env_file: aws.env.encrypted
+  encrypted_env_file: op.env.encrypted
+  environment:
+    - AWS_ACCESS_KEY_ID=op://app-scheduled-codeship-build/serverless-user/username
+    - AWS_SECRET_ACCESS_KEY=op://app-scheduled-codeship-build/serverless-user/password
+    - CS_ORGANIZATION=op://app-scheduled-codeship-build/codeship/organization
+    - CS_PASSWORD=op://app-scheduled-codeship-build/codeship/credential
+    - CS_USERNAME=op://app-scheduled-codeship-build/codeship/username
+    - CS1_PROJECT_UUID=op://app-scheduled-codeship-build/codeship/config/project1_uuid
+    - CS1_BUILD_REFERENCE=op://app-scheduled-codeship-build/codeship/config/project2_build_reference
+    - CS2_PROJECT_UUID=op://app-scheduled-codeship-build/codeship/config/project2_uuid
+    - CS2_BUILD_REFERENCE=op://app-scheduled-codeship-build/codeship/config/project2_build_reference
   cached: true

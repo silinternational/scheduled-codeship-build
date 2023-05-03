@@ -1,8 +1,8 @@
 app:
 	docker-compose up -d app
 
-debug: app
-	docker-compose exec app bash
+debug:
+	docker-compose run --rm app bash
 
 build:
 	docker-compose run --rm app ./codeship/build.sh
