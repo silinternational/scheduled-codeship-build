@@ -79,7 +79,7 @@ You can just ignore that.
 
 ### AWS Serverless User
 
-1. Use the Terraform CLI to taint the old access key
+1. Use the Terraform CLI to [replace](https://developer.hashicorp.com/terraform/cli/commands/plan#replace-address) the old access key
 2. Run a new plan on Terraform Cloud
 3. Review and apply the new plan if it is correct
 4. Copy the new key and secret from the Terraform output into 1Password. (Reference the codeship-services.yml file for the name of the vault and item to use.)
