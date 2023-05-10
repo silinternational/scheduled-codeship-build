@@ -2,110 +2,127 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
-	"os"
 	"strings"
 
 	"github.com/aws/aws-lambda-go/lambda"
-	codeship "github.com/codeship/codeship-go"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/ssm"
+	"github.com/codeship/codeship-go"
 )
 
-// EnvKeyCSOrganization is the environment variable for
+// ParamOrganization is the environment variable for
 // the Codeship organization
-const EnvKeyCSOrganization = "CS_ORGANIZATION"
+const ParamOrganization = "organization"
 
-// EnvKeyCSPassword is the environment variable for
+// ParamPassword is the environment variable for
 // the Codeship password
-const EnvKeyCSPassword = "CS_PASSWORD"
+const ParamPassword = "password"
 
-// EnvKeyCSUsername is the environment variable for
+// ParamUsername is the environment variable for
 // the Codeship username
-const EnvKeyCSUsername = "CS_USERNAME"
+const ParamUsername = "username"
 
-// EnvKeyCSProjectUUID is the environment variable for
-// the uuid of the target Codeship project
-const EnvKeyCSProjectUUID = "CS_PROJECT_UUID"
+// ParamProjects is a list of Codeship project UUIDs and build references, as a list of json objects
+// e.g.: [{"uuid":"26e97136-8265-4172-867d-3392c7b3c322","ref":"20.04"}]
+// Each reference will be prepended with "heads/" if it is not already included.
+const ParamProjects = "projects"
 
-// EnvKeyCSBuildReference is the environment variable for
-// the desired reference for the build of the Codeship project
-// e.g. "20.04"  (which will have "heads/" tacked onto the beginning, if it isn't there)
-const EnvKeyCSBuildReference = "CS_BUILD_REFERENCE"
-
-func getRequiredString(envKey string, configEntry *string) error {
-	if *configEntry != "" {
-		return nil
-	}
-
-	value := os.Getenv(envKey)
-	if value == "" {
-		return fmt.Errorf("required value missing for environment variable %s", envKey)
-	}
-	*configEntry = value
-
-	return nil
+type ProjectConfig struct {
+	UUID string `json:"uuid"`
+	Ref  string `json:"ref"`
 }
 
 func (c *BuilderConfig) init() error {
-	if err := getRequiredString(EnvKeyCSOrganization, &c.CSOrganization); err != nil {
+	cfg, err := config.LoadDefaultConfig(context.Background())
+	if err != nil {
 		return err
 	}
 
-	if err := getRequiredString(EnvKeyCSPassword, &c.CSPassword); err != nil {
+	ssmClient := ssm.NewFromConfig(cfg)
+	input := ssm.GetParametersByPathInput{
+		Path:           aws.String("/scheduled-codeship-build"),
+		WithDecryption: aws.Bool(true),
+	}
+	path, err := ssmClient.GetParametersByPath(context.Background(), &input)
+	if err != nil {
 		return err
 	}
+	params := path.Parameters
+	if c.appConfigParams == nil {
+		c.appConfigParams = map[string]string{}
+	}
+	for _, p := range params {
+		if p.Name == nil || p.Value == nil {
+			continue
+		}
 
-	if err := getRequiredString(EnvKeyCSUsername, &c.CSUsername); err != nil {
-		return err
+		c.appConfigParams[*p.Name] = *p.Value
 	}
 
-	if err := getRequiredString(EnvKeyCSProjectUUID, &c.CSProjectUUID); err != nil {
-		return err
+	requiredParams := []string{
+		ParamOrganization,
+		ParamPassword,
+		ParamUsername,
+		ParamProjects,
 	}
 
-	if err := getRequiredString(EnvKeyCSBuildReference, &c.CSBuildReference); err != nil {
-		return err
+	for _, p := range requiredParams {
+		if c.appConfigParams[p] == "" {
+			return fmt.Errorf("required value missing for parameter '%s'", p)
+		}
 	}
-
 	return nil
 }
 
 type BuilderConfig struct {
-	CSOrganization string `json:"CSOrganization"`
-	CSPassword     string `json:"CSPassword"`
-	CSUsername     string `json:"CSUsername"`
-
-	CSBuildReference string `json:"CSBuildReference"`
-	CSProjectUUID    string `json:"CSProjectUUID"`
+	appConfigParams map[string]string
 }
 
-func triggerBuild(ctx context.Context, config BuilderConfig, org *codeship.Organization) (codeship.Response, error) {
+func triggerBuild(ctx context.Context, project ProjectConfig, org *codeship.Organization) error {
+	log.Printf("Building project %s on reference %s\n", project.UUID, project.Ref)
+
 	headsPrefix := "heads/"
-	buildRef := config.CSBuildReference
+	buildRef := project.Ref
 	if !strings.HasPrefix(buildRef, headsPrefix) {
 		buildRef = headsPrefix + buildRef
 	}
-	success, resp, err := org.CreateBuild(ctx, config.CSProjectUUID, buildRef, "")
+	success, resp, err := org.CreateBuild(ctx, project.UUID, buildRef, "")
 	if err != nil {
-		return codeship.Response{},
-			fmt.Errorf("error triggering build on project with uuid: %s. %s",
-				config.CSProjectUUID, err)
+		return fmt.Errorf("error triggering build on project with uuid: %s. %s",
+			project.UUID, err)
 	}
 
 	if !success {
-		return codeship.Response{},
-			errors.New("failed to trigger build on project with uuid: " + config.CSProjectUUID)
+		return errors.New("failed to trigger build on project with uuid: " + project.UUID)
 	}
-	return resp, nil
+
+	log.Printf("Response from codeship build call: %d %s\n", resp.StatusCode, resp.Status)
+	return nil
 }
 
-func handler(config BuilderConfig) error {
+func triggerBuilds(ctx context.Context, projects []ProjectConfig, org *codeship.Organization) error {
+	for i := range projects {
+		if err := triggerBuild(ctx, projects[i], org); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func handler() error {
+	var config BuilderConfig
 	if err := config.init(); err != nil {
 		return err
 	}
 
-	auth := codeship.NewBasicAuth(config.CSUsername, config.CSPassword)
+	username := config.appConfigParams[ParamUsername]
+	password := config.appConfigParams[ParamPassword]
+	auth := codeship.NewBasicAuth(username, password)
 	client, err := codeship.New(auth)
 	if err != nil {
 		return errors.New("error creating api client: " + err.Error())
@@ -113,22 +130,32 @@ func handler(config BuilderConfig) error {
 
 	ctx := context.Background()
 
-	org, err := client.Organization(ctx, config.CSOrganization)
+	organization := config.appConfigParams[ParamOrganization]
+	org, err := client.Organization(ctx, organization)
 	if err != nil {
 		return errors.New("error scoping api client to organization: " + err.Error())
 	}
 
 	log.Print("Succeeded in authenticating with Codeship")
 
-	resp, err := triggerBuild(ctx, config, org)
+	projects := config.appConfigParams[ParamProjects]
+	projectList, err := unmarshalProjectList(projects)
 	if err != nil {
+		return fmt.Errorf("unable to parse project configuration: %w", err)
+	}
+
+	if err = triggerBuilds(ctx, projectList, org); err != nil {
 		return err
 	}
-	log.Printf("Response from codeship build call: %d %s\n", resp.StatusCode, resp.Status)
 
 	return nil
 }
 
 func main() {
 	lambda.Start(handler)
+}
+
+func unmarshalProjectList(jsonList string) (config []ProjectConfig, err error) {
+	err = json.Unmarshal([]byte(jsonList), &config)
+	return
 }

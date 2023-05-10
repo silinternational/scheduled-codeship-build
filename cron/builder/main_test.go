@@ -4,37 +4,20 @@ import (
 	"testing"
 )
 
-func TestBuilderConfigMissingValue(t *testing.T) {
-	config := BuilderConfig{
-		CSOrganization: "OurOrg",
-		CSUsername:     "MyName",
+func TestUnmarshalProjectList(t *testing.T) {
+	good := `[{"uuid":"26e97136-8265-4172-867d-3392c7b3c322","ref":"20.04"}]`
+	l, err := unmarshalProjectList(good)
+	if err != nil {
+		t.Errorf("unexpected error: %s", err)
+	}
+	if len(l) != 1 {
+		t.Errorf("expected a list of projects, got %s", l)
 	}
 
-	err := config.init()
+	bad := `[{"uuid":"26e97136-8265-4172-867d-3392c7b3c322","ref":"notice the trailing comma ->"},]`
+	l, err = unmarshalProjectList(bad)
 	if err == nil {
-		t.Error("Expected an error, but did not got one")
-		return
-	}
-
-	want := "required value missing for environment variable " + EnvKeyCSPassword
-	if err.Error() != want {
-		t.Errorf(`incorrect error. Expected "%s"", but got "%s"`, want, err.Error())
-		return
-	}
-}
-
-func TestBuilderConfigOK(t *testing.T) {
-	config := BuilderConfig{
-		CSOrganization:   "OurOrg",
-		CSPassword:       "MyPass",
-		CSUsername:       "MyName",
-		CSBuildReference: "develop",
-		CSProjectUUID:    "abcd1234-abcd-1234-dcba-abcd1234dcba",
-	}
-
-	if err := config.init(); err != nil {
-		t.Errorf("Did not expect an error, but got one: %v", err.Error())
-		return
+		t.Errorf("expected an error but got nil")
 	}
 }
 
@@ -43,15 +26,7 @@ func TestBuilderConfigOK(t *testing.T) {
 func TestHandler(t *testing.T) {
 	t.Skip("Only run this in local development")
 
-	// Just initialize config from .env file
-	config := BuilderConfig{}
-
-	if err := config.init(); err != nil {
-		t.Errorf("failed initializing config for test: %v", err)
-		return
-	}
-
-	err := handler(config)
+	err := handler()
 	if err != nil {
 		t.Errorf("error getting results: %v", err)
 		return
