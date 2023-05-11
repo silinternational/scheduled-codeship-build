@@ -4,7 +4,7 @@
  */
 module "serverless-user" {
   source  = "silinternational/serverless-user/aws"
-  version = "0.1.0"
+  version = "0.1.3"
 
   app_name   = "scheduled-codeship-build"
   aws_region = var.aws_region
