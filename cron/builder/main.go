@@ -61,7 +61,13 @@ func (c *BuilderConfig) init() error {
 			continue
 		}
 
-		c.appConfigParams[*p.Name] = *p.Value
+		s := strings.Split(*p.Name, "/")
+		if len(s) != 3 {
+			continue
+		}
+		name := s[2]
+
+		c.appConfigParams[name] = *p.Value
 	}
 
 	requiredParams := []string{
