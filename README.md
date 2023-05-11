@@ -47,4 +47,5 @@ You can just ignore that.
 ### Codeship
 
 Codeship uses an ordinary username and password with HTTP Basic Authentication for API access. When the username
-or password changes, simply update the correct fields in 1Password. Reference the codeship-services.yml file to find the name of the vault, item, and field to use.
+or password changes, simply update the `codeship_username` or `codeship_password` variables in Terraform Cloud
+and create/apply a new plan.
