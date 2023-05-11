@@ -24,16 +24,9 @@ package:
     - './bin/**'
 
 functions:
-  project1:
+  builder:
     handler: bin/builder
     events:
       # cron(Minutes Hours Day-of-month Month Day-of-week Year)
       # Either `day-of-month` or `day-of-week` must be a question mark (?)
       - schedule: cron(0 1 8 * ? *)
-
-  project2:
-    handler: bin/builder
-    events:
-      # cron(Minutes Hours Day-of-month Month Day-of-week Year)
-      # Either `day-of-month` or `day-of-week` must be a question mark (?)
-      - schedule: cron(0 3 8 * ? *)
