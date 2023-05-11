@@ -26,11 +26,7 @@ one environment variable:
 
 * OP_SERVICE_ACCOUNT_TOKEN
 
-To configure this variable:
-
-1. Create a file `op.env` with this OP variable above and its correct value.
-2. Save the AES key from the codeship project in a `cloudbees.aes` file.
-3. Run the following command and commit the `op.env.encrypted` file to the git repo.
+See the [1Password] section below for credential rotation instructions.
 
 ```sh
 jet encrypt op.env op.env.encrypted
@@ -71,10 +67,10 @@ You can just ignore that.
 
 ### AWS Serverless User
 
-1. Use the Terraform CLI to taint the old access key
+1. Use the Terraform CLI to taint the old access key: `terraform taint module.serverless-user.aws_iam_access_key.serverless`
 2. Run a new plan on Terraform Cloud
 3. Review and apply the new plan if it is correct
-4. Copy the new key and secret from the Terraform output into 1Password. (Reference the codeship-services.yml file for the name of the vault and item to use.)
+4. Copy the new key and secret from the Terraform state and paste into 1Password. (Reference the codeship-services.yml file for the name of the vault and item to use.)
 
 ### Codeship
 
