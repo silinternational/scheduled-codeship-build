@@ -10,18 +10,6 @@ module "serverless-user" {
   aws_region = var.aws_region
 }
 
-resource "aws_ssm_parameter" "username" {
-  name = "${var.ssm_param_path}/username"
-  type = "String"
-  insecure_value = var.cs_user
-}
-
-resource "aws_ssm_parameter" "password" {
-  name = "${var.ssm_param_path}/password"
-  type = "SecureString"
-  value = var.cs_pass
-}
-
 resource "aws_ssm_parameter" "organization" {
   name = "${var.ssm_param_path}/organization"
   type = "String"

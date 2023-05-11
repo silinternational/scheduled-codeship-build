@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"os"
 	"strings"
 
 	"github.com/aws/aws-lambda-go/lambda"
@@ -15,17 +16,17 @@ import (
 	"github.com/codeship/codeship-go"
 )
 
+// EnvKeyCSPassword is the environment variable for
+// the Codeship password
+const EnvKeyCSPassword = "CS_PASSWORD"
+
+// EnvKeyCSUsername is the environment variable for
+// the Codeship username
+const EnvKeyCSUsername = "CS_USERNAME"
+
 // ParamOrganization is the environment variable for
 // the Codeship organization
 const ParamOrganization = "organization"
-
-// ParamPassword is the environment variable for
-// the Codeship password
-const ParamPassword = "password"
-
-// ParamUsername is the environment variable for
-// the Codeship username
-const ParamUsername = "username"
 
 // ParamProjects is a list of Codeship project UUIDs and build references, as a list of json objects
 // e.g.: [{"uuid":"26e97136-8265-4172-867d-3392c7b3c322","ref":"20.04"}]
@@ -37,7 +38,29 @@ type ProjectConfig struct {
 	Ref  string `json:"ref"`
 }
 
+func getRequiredString(envKey string, configEntry *string) error {
+	if *configEntry != "" {
+		return nil
+	}
+
+	value := os.Getenv(envKey)
+	if value == "" {
+		return fmt.Errorf("required value missing for environment variable %s", envKey)
+	}
+	*configEntry = value
+
+	return nil
+}
+
 func (c *BuilderConfig) init() error {
+	if err := getRequiredString(EnvKeyCSPassword, &c.CSPassword); err != nil {
+		return err
+	}
+
+	if err := getRequiredString(EnvKeyCSUsername, &c.CSUsername); err != nil {
+		return err
+	}
+
 	cfg, err := config.LoadDefaultConfig(context.Background())
 	if err != nil {
 		return err
@@ -72,8 +95,6 @@ func (c *BuilderConfig) init() error {
 
 	requiredParams := []string{
 		ParamOrganization,
-		ParamPassword,
-		ParamUsername,
 		ParamProjects,
 	}
 
@@ -86,6 +107,9 @@ func (c *BuilderConfig) init() error {
 }
 
 type BuilderConfig struct {
+	CSPassword string `json:"CSPassword"`
+	CSUsername string `json:"CSUsername"`
+
 	appConfigParams map[string]string
 }
 
@@ -126,9 +150,7 @@ func handler() error {
 		return err
 	}
 
-	username := config.appConfigParams[ParamUsername]
-	password := config.appConfigParams[ParamPassword]
-	auth := codeship.NewBasicAuth(username, password)
+	auth := codeship.NewBasicAuth(config.CSUsername, config.CSPassword)
 	client, err := codeship.New(auth)
 	if err != nil {
 		return errors.New("error creating api client: " + err.Error())

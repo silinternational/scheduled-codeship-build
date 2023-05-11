@@ -5,7 +5,12 @@ services:
   app:
     build: .
     env_file:
-      - local.env # add the non-AWS entries from aws.env.example
+      - op.env
+    environment:
+      - AWS_ACCESS_KEY_ID=op://app-scheduled-codeship-build/serverless-user/username
+      - AWS_SECRET_ACCESS_KEY=op://app-scheduled-codeship-build/serverless-user/password
+      - CS_PASSWORD=op://app-scheduled-codeship-build/codeship/credential
+      - CS_USERNAME=op://app-scheduled-codeship-build/codeship/username
     volumes:
       - ./:/src
     command: ./codeship/build.sh

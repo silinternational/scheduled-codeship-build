@@ -17,19 +17,6 @@ variable "ssm_param_path" {
   default = "scheduled-codeship-build"
 }
 
-# Note: this variable name is excessively abbreviated to silence Codeship's security alert system
-variable "cs_user" {
-  description = "A username for Codeship API access, used for triggering builds on the configured projects"
-  type = string
-}
-
-# Note: this variable name is excessively abbreviated to silence Codeship's security alert system
-variable "cs_pass" {
-  description = "The password of the Codeship user, for API calls to trigger builds on the configured projects"
-  type = string
-  sensitive = true
-}
-
 variable "codeship_organization" {
   description = "The Codeship organization containing the configured projects"
   type = string
