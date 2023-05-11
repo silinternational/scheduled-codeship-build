@@ -6,21 +6,7 @@ It makes use of the *codeship-go* API client.
 ** Make sure to give permissions to the Codeship user to trigger builds
 on the targeted projects
 
-## Required Environment Variables (for the lambda config)
-
-* CS_ORGANIZATION // the Codeship organization
-* CS_PASSWORD // the Codeship password
-* CS_USERNAME // the Codeship username for authentication
-
-
-* CS1_PROJECT_UUID // the uuid of the first target Codeship project
-* CS1_BUILD_REFERENCE // the desired reference for the build, e.g. "20.04" or "develop"
-(note: "heads/" will be prepended to this value, if it is not already there)
-
-
-* CS2_PROJECT_UUID // the uuid of the second target Codeship project
-* CS2_BUILD_REFERENCE // the desired reference for the build, e.g. "20.04" or "develop"
-(note: "heads/" will be prepended to this value, if it is not already there)
+# Environment Variables
 
 ## Environment variables for deploying via Codeship
 See the `aws.env.example` file for the full set of environment variables.
@@ -60,4 +46,5 @@ You can just ignore that.
 
 ### Codeship
 
-(TBD)
+Codeship uses an ordinary username and password with HTTP Basic Authentication for API access. When the username
+or password changes, simply update the correct fields in 1Password. Reference the codeship-services.yml file to find the name of the vault, item, and field to use.

@@ -16,3 +16,27 @@ output "serverless-access-key-id" {
 output "serverless-secret-access-key" {
   value = nonsensitive(module.serverless-user.aws_secret_access_key)
 }
+
+resource "aws_ssm_parameter" "username" {
+  name = "${var.ssm_param_path}/username"
+  type = "String"
+  insecure_value = var.codeship_username
+}
+
+resource "aws_ssm_parameter" "password" {
+  name = "${var.ssm_param_path}/password"
+  type = "SecureString"
+  value = var.codeship_password
+}
+
+resource "aws_ssm_parameter" "organization" {
+  name = "${var.ssm_param_path}/organization"
+  type = "String"
+  insecure_value = var.codeship_organization
+}
+
+resource "aws_ssm_parameter" "projects" {
+  name = "${var.ssm_param_path}/projects"
+  type = "String"
+  insecure_value = var.codeship_projects
+}

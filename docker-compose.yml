@@ -8,4 +8,4 @@ services:
       - local.env # add the non-AWS entries from aws.env.example
     volumes:
       - ./:/src
-    command: ./build.sh
+    command: ./codeship/build.sh
