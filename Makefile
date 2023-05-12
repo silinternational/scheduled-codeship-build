@@ -2,7 +2,7 @@ app:
 	docker-compose up -d app
 
 debug: app
-	docker-compose exec app bash
+	docker-compose run --rm app bash
 
 build:
 	docker-compose run --rm app ./codeship/build.sh

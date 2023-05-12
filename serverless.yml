@@ -3,15 +3,20 @@ service: scheduled-codeship-build
 provider:
   name: aws
   runtime: go1.x
-  environment:
-    CS_ORGANIZATION: ${env:CS_ORGANIZATION}
-    CS_PASSWORD: ${env:CS_PASSWORD}
-    CS_USERNAME: ${env:CS_USERNAME}
   stage: prod
+  region: us-east-1
   timeout: 300
   versionFunctions: false
   memorySize: 512
-  logRetentionInDays: 14
+  logRetentionInDays: 60
+
+  iam:
+    role:
+      statements:
+      - Effect: "Allow"
+        Action:
+        - "ssm:GetParametersByPath"
+        Resource: "arn:aws:ssm:${self:provider.region}:*:parameter/scheduled-codeship-build*"
 
 package:
   patterns:
@@ -19,25 +24,9 @@ package:
     - './bin/**'
 
 functions:
-  project1:
-    environment:
-      CS_BUILD_REFERENCE: ${env:CS1_BUILD_REFERENCE}
-      CS_PROJECT_UUID: ${env:CS1_PROJECT_UUID}
+  builder:
     handler: bin/builder
     events:
       # cron(Minutes Hours Day-of-month Month Day-of-week Year)
       # Either `day-of-month` or `day-of-week` must be a question mark (?)
       - schedule: cron(0 1 8 * ? *)
-      # - schedule: cron(0/10 * * * ? *)
-
-  project2:
-    environment:
-      CS_BUILD_REFERENCE: ${env:CS2_BUILD_REFERENCE}
-      CS_PROJECT_UUID: ${env:CS2_PROJECT_UUID}
-    handler: bin/builder
-    events:
-      # cron(Minutes Hours Day-of-month Month Day-of-week Year)
-      # Either `day-of-month` or `day-of-week` must be a question mark (?)
-      - schedule: cron(0 3 8 * ? *)
-      # - schedule: cron(0/10 * * * ? *)
-
