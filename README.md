@@ -42,7 +42,7 @@ jet encrypt op.env op.env.encrypted
 
 1. Add a service account token in a file op.env, either by manually creating it or by decrypting the op.env.encrypted file.
 2. Run `make debug` to start a container in Docker Compose
-3. You can now run any serverless command prefixed with `op run` and 1Password will insert the correct credentials from your vault. For example: `op run sls info` will show the status of the Lambda on your AWS account.
+3. You can now run any serverless command prefixed with `op run` and 1Password will insert the correct credentials from the service account's vault. For example: `op run sls info` will show the status of the Lambda on your AWS account.
 
 ## Go tests
 After starting a debug container as described above, comment out the `t.Skip` line in 
