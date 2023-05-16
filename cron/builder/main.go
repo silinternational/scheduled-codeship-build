@@ -13,7 +13,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/ssm"
-	"github.com/codeship/codeship-go"
 )
 
 // EnvKeyCSPassword is the environment variable for
@@ -24,7 +23,7 @@ const EnvKeyCSPassword = "CS_PASSWORD"
 // the Codeship username
 const EnvKeyCSUsername = "CS_USERNAME"
 
-// ParamOrganization is the environment variable for
+// ParamOrganization is the parameter name for the
 // the Codeship organization
 const ParamOrganization = "organization"
 
