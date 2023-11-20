@@ -2,8 +2,8 @@
 .serverless
 package-lock.json
 
-# golang output binary directory
-bin
+# Go output binary
+bootstrap
 
 # local creds and stuff
 aws.credentials
